@@ -1,8 +1,8 @@
 from mysql.connector.errors import Error
-import conexion
+import Conexion
 
 
-db = conexion.Conexion()
+db = Conexion.Conexion()
 
 
 class crud_clientes:
@@ -10,8 +10,8 @@ class crud_clientes:
     def consultar(self, buscar):
         return db.consultar(
             """
-            SELECT idCliente, codigo, nombre, direccion, telefono, email, tipo
-            FROM clientes
+            SELECT idUsuario, usuario, clave, nombre, direccion, telefono
+            FROM usuarios
             WHERE codigo LIKE %s OR nombre LIKE %s
             ORDER BY nombre
             """,
@@ -34,30 +34,30 @@ class crud_clientes:
 
             if accion == 'nuevo':
                 sql = """
-                    INSERT INTO clientes(codigo, nombre, direccion, telefono, email, tipo)
-                    VALUES(%s, %s, %s, %s, %s, %s)
+                    INSERT INTO usuarios(usuario, clave, nombre, direccion, telefono)
+                    VALUES(%s, %s, %s, %s, %s)
                 """
                 valores = (
-                    datos['codigo'], datos['nombre'], datos['direccion'],
-                    datos['telefono'], datos['email'], datos['tipo']
+                    datos['usuario'], datos['clave'], datos['nombre'],
+                    datos['direccion'], datos['telefono']
                 )
 
             elif accion == 'modificar':
                 sql = """
-                    UPDATE clientes
+                    UPDATE usuarios
                     SET codigo=%s, nombre=%s, direccion=%s,
                         telefono=%s, email=%s, tipo=%s
-                    WHERE idCliente=%s
+                    WHERE idUsuario=%s
                 """
                 valores = (
-                    datos['codigo'], datos['nombre'], datos['direccion'],
-                    datos['telefono'], datos['email'], datos['tipo'],
-                    datos['idCliente']
+                  datos['usuario'], datos['clave'], datos['nombre'],
+                                      datos['direccion'], datos['telefono']
+                    datos['idUsuario']
                 )
 
             elif accion == 'eliminar':
-                sql = "DELETE FROM clientes WHERE idCliente=%s"
-                valores = (datos['idCliente'],)
+                sql = "DELETE FROM usuarios WHERE idUsuario=%s"
+                valores = (datos['idUsuario'],)
 
             else:
                 return "Accion no valida"
@@ -65,6 +65,6 @@ class crud_clientes:
             return db.ejecutar(sql, valores)
 
         except Error as e:
-            return f"Error al guardar el cliente: {e}"
+            return f"Error al guardar el usuario: {e}"
         except KeyError as e:
             return f"Falta el campo: {e}"

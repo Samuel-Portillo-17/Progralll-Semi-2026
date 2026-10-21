@@ -68,25 +68,24 @@
         </div>
 
 <script>
-let accionCliente = 'nuevo';
+let accionUsuario = 'nuevo';
 let ultimoCalculo = null;
 
 const $ = id => document.getElementById(id);
 
-$('frmCliente').addEventListener('submit', async e => {
+$('frmUsuario').addEventListener('submit', async e => {
     e.preventDefault();
     const datos = {
-        accion: accionCliente,
-        idCliente: $('idCliente').value,
-        codigo: $('txtCodigoCliente').value,
-        nombre: $('txtNombreCliente').value,
-        direccion: $('txtDireccionCliente').value,
-        telefono: $('txtTelefonoCliente').value,
-        email: $('txtEmailCliente').value,
-        tipo: $('cboTipoPersona').value
+        accion: accionUsuario,
+        idUsuario: $('idUsuario').value,
+        usuario: $('txtUsuario').value,
+        clave: $('txtClave').value,
+        nombre: $('txtNombreUsuario').value,
+        direccion: $('txtDireccionUsuario').value,
+        telefono: $('txtTelefonoUsuario').value
     };
 
-    const response = await fetch('/cliente', {
+    const response = await fetch('/usuario', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(datos)
@@ -143,12 +142,12 @@ function editarUsuario(data) {
 }
 
 async function eliminarCliente(data) {
-    if (!confirm(¿Seguro de eliminar al cliente: ${data.nombre}?)) return;
+    if (!confirm(`¿Seguro de eliminar al usuario: ${data.nombre}?`)) return;
 
-    const response = await fetch('/cliente', {
+    const response = await fetch('/usuario', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({accion: 'eliminar', idCliente: data.idCliente})
+        body: JSON.stringify({accion: 'eliminar', idUsuario: data.idUsuario})
     });
     const respuesta = await response.json();
 
