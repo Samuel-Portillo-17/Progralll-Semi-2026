@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema para parcial 2</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container-fluid py-3">
+    <h2 class="text-center mb-4">Sistema para parcial 2</h2>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header">Usuario</div>
+                <div class="card-body">
+                    <form id="frmUsuario">
+                        <input type="hidden" id="idUsuario">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <input pattern="^[0-9]{3,10}$" required placeholder="IdUsuario" id="txtCodigoUsuario" class="form-control" type="text">
+                            </div>
+                            <div class="col-md-6">
+                                <input pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ ]{3,}$" required placeholder="Usuario" id="txtUsuario" class="form-control" type="text">
+                            </div>
+                             <div class="col-md-6">
+                                <input pattern="^[0-9]{3,10}$" required placeholder="Clave" id="txtClaveUsuario" class="form-control" type="text">
+                            </div>
+                            <div class="col-md-6">
+                                <input pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ ]{3,}$" required placeholder="nombre" id="txtNombreUsuario" class="form-control" type="text">
+                            </div>
+                            <div class="col-12">
+                                <input placeholder="Dirección" id="txtDireccionUsuario" class="form-control" type="text">
+                            </div>
+                            <div class="col-md-6">
+                                <input pattern="^[0-9]{4}-[0-9]{4}$" placeholder="Teléfono" id="txtTelefonoUsuario" class="form-control" type="text">
+                            </div>
+                             
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                <button type="button" id="btnBuscarCliente" class="btn btn-secondary">Buscar</button>
+                                <button type="reset" class="btn btn-warning">Limpiar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header">Búsqueda de usuario</div>
+                <div class="card-body">
+                    <input type="search" placeholder="Buscar por código o nombre" id="txtBuscarUsuario" class="form-control mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Código</th><th>Nombre</th><th>Tipo</th><th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblUsuarios"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script>
+let accionCliente = 'nuevo';
+let ultimoCalculo = null;
+
+const $ = id => document.getElementById(id);
+
+$('frmCliente').addEventListener('submit', async e => {
+    e.preventDefault();
+    const datos = {
+        accion: accionCliente,
+        idCliente: $('idCliente').value,
+        codigo: $('txtCodigoCliente').value,
+        nombre: $('txtNombreCliente').value,
+        direccion: $('txtDireccionCliente').value,
+        telefono: $('txtTelefonoCliente').value,
+        email: $('txtEmailCliente').value,
+        tipo: $('cboTipoPersona').value
+    };
+
+    const response = await fetch('/cliente', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+    });
+    const respuesta = await response.json();
+
+    if (respuesta.msg !== 'ok') {
+        alert(respuesta.msg);
+        return;
+    }
+
+    limpiarCliente();
+    obtenerClientes();
+    cargarEmpresas();
+});
+
+$('frmCliente').addEventListener('reset', e => {
+    e.preventDefault();
+    limpiarCliente();
+});
+
+$('txtBuscarCliente').addEventListener('keyup', () => obtenerClientes($('txtBuscarCliente').value));
+$('btnBuscarCliente').addEventListener('click', () => obtenerClientes($('txtBuscarCliente').value));
+
+async function obtenerClientes(buscar = '') {
+    const response = await fetch(`/usuario?buscar=${encodeURIComponent(buscar)}`);
+    const datos = await response.json();
+    let filas = '';
+
+    datos.forEach(e => {
+        filas += `<tr>
+            <td>${e.codigo}</td>
+            <td>${e.nombre}</td>
+            <td>${e.tipo}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick='editarUsuario(${JSON.stringify(e)})'>Editar</button>
+                <button class="btn btn-sm btn-danger" onclick='eliminarUsuario(${JSON.stringify(e)})'>DEL</button>
+            </td>
+        </tr>`;
+    });
+    $('tblUsuarios').innerHTML = filas;
+}
+
+function editarUsuario(data) {
+    accionCliente = 'modificar';
+    $('idUsuario').value = data.idUsuario;
+    $('txtCodigoCliente').value = data.codigo;
+    $('txtNombreCliente').value = data.nombre;
+    $('txtDireccionCliente').value = data.direccion;
+    $('txtTelefonoCliente').value = data.telefono;
+    $('txtEmailCliente').value = data.email;
+    $('cboTipoPersona').value = data.tipo;
+    $('frmCliente').scrollIntoView({behavior: 'smooth'});
+}
+
+async function eliminarCliente(data) {
+    if (!confirm(¿Seguro de eliminar al cliente: ${data.nombre}?)) return;
+
+    const response = await fetch('/cliente', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({accion: 'eliminar', idCliente: data.idCliente})
+    });
+    const respuesta = await response.json();
+
+    if (respuesta.msg !== 'ok') alert(respuesta.msg);
+    else {
+        obtenerClientes();
+        cargarEmpresas();
+    }
+}
+
+function limpiarCliente() {
+    accionCliente = 'nuevo';
+    $('idCliente').value = '';
+    $('frmCliente').reset();
+} 
+
+</script>
+
+</body>
+</html>
