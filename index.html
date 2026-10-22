@@ -3,168 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema para parcial 2</title>
+    <title>Sistema de impuestos a las actividades economicas</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
+    <!-- Default theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
+    <!-- Semantic UI theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/semantic.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
 </head>
-<body class="bg-light">
+<body>
+    <script>
+        // Validación de seguridad: si no ha iniciado sesión, se redirige al login
+        if (!localStorage.getItem("usuarioLogueado")) {
+            window.location.href = "/login.html";
+        }
+    </script>
 
-<div class="container-fluid py-3">
-    <h2 class="text-center mb-4">Sistema para parcial 2</h2>
-
-    <div class="row g-3">
-        <div class="col-lg-5">
-            <div class="card shadow-sm">
-                <div class="card-header">Usuario</div>
-                <div class="card-body">
-                    <form id="frmUsuario">
-                        <input type="hidden" id="idUsuario">
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <input pattern="^[0-9]{3,10}$" required placeholder="IdUsuario" id="txtCodigoUsuario" class="form-control" type="text">
-                            </div>
-                            <div class="col-md-6">
-                                <input pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ ]{3,}$" required placeholder="Usuario" id="txtUsuario" class="form-control" type="text">
-                            </div>
-                             <div class="col-md-6">
-                                <input pattern="^[0-9]{3,10}$" required placeholder="Clave" id="txtClaveUsuario" class="form-control" type="text">
-                            </div>
-                            <div class="col-md-6">
-                                <input pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ ]{3,}$" required placeholder="nombre" id="txtNombreUsuario" class="form-control" type="text">
-                            </div>
-                            <div class="col-12">
-                                <input placeholder="Dirección" id="txtDireccionUsuario" class="form-control" type="text">
-                            </div>
-                            <div class="col-md-6">
-                                <input pattern="^[0-9]{4}-[0-9]{4}$" placeholder="Teléfono" id="txtTelefonoUsuario" class="form-control" type="text">
-                            </div>
-                             
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Guardar</button>
-                                <button type="button" id="btnBuscarCliente" class="btn btn-secondary">Buscar</button>
-                                <button type="reset" class="btn btn-warning">Limpiar</button>
-                            </div>
-                        </div>
-                    </form>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">::.. SISTEMA DE IMPUESTOS A LAS ACTIVIDADES ECONOMICAS ..::</a>
+            <div class="collapse navbar-collapse" id="mnxImpuestos">
+                <div class="navbar-nav me-auto">
+                    <a class="nav-link" href="#" data-form="clientes">Clientes</a>
+                    <a class="nav-link" href="#" data-form="productos">Productos</a>
+                    <a class="nav-link" href="#" data-form="usuarios">Usuarios</a>
                 </div>
-            </div>
-
-            <div class="card shadow-sm mt-3">
-                <div class="card-header">Búsqueda de usuario</div>
-                <div class="card-body">
-                    <input type="search" placeholder="Buscar por código o nombre" id="txtBuscarUsuario" class="form-control mb-3">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Código</th><th>Nombre</th><th>Tipo</th><th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblUsuarios"></tbody>
-                        </table>
-                    </div>
+                <div class="d-flex">
+                    <button class="btn btn-outline-danger btn-sm" id="btnCerrarSesion">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
+    </nav>
 
-<script>
-let accionUsuario = 'nuevo';
-let ultimoCalculo = null;
+    <div class="container-fluid position-relative mt-3">
+        <div class="position-absolute" id="clientes"></div>
+        <div class="position-absolute" id="busqueda_clientes"></div>
+        <div class="position-absolute" id="productos"></div>
+        <div class="position-absolute" id="busqueda_productos"></div>
+        <div class="position-absolute" id="usuarios"></div>
+        <div class="position-absolute" id="busqueda_usuarios"></div>
+    </div>
 
-const $ = id => document.getElementById(id);
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.2/jquery-ui.js" integrity="sha512-nF9ZY+o4GTMKGuKfrwYSdqrbG59QLhdJgtXOPiRZ4CkswwdjyTaPn0qvbRoIsih0ZbEKfCN9dU7lhqkIQUdY/A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", events => {
+            const mnxImpuestos = document.getElementById('mnxImpuestos');
+            mnxImpuestos.addEventListener('click', e => {
+                if(e.target.dataset.form) {
+                    e.preventDefault();
+                    let form = e.target.dataset.form;
+                    cargarForm(form);
+                }
+            });
 
-$('frmUsuario').addEventListener('submit', async e => {
-    e.preventDefault();
-    const datos = {
-        accion: accionUsuario,
-        idUsuario: $('idUsuario').value,
-        usuario: $('txtUsuario').value,
-        clave: $('txtClave').value,
-        nombre: $('txtNombreUsuario').value,
-        direccion: $('txtDireccionUsuario').value,
-        telefono: $('txtTelefonoUsuario').value
-    };
+            // Botón para salir de la sesión
+            document.getElementById("btnCerrarSesion").addEventListener("click", () => {
+                localStorage.removeItem("usuarioLogueado");
+                window.location.href = "/login.html";
+            });
+        });
 
-    const response = await fetch('/usuario', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(datos)
-    });
-    const respuesta = await response.json();
+        function cargarForm(form, callback){
+            if( $(`#${form} > form`).length <= 0 ){
+                fetch(`/vistas?form=${form}`)
+                .then(response => response.text())
+                .then(ventana => {
+                    $(`#${form}`).html(ventana).draggable();
+                    cerrarVentana();
+                    if(callback) callback();
+                })
+                .catch(error => console.error('Error al cargar el formulario:', error));
+            }else{
+                $(`#${form}`).show();
+            }
+        }
 
-    if (respuesta.msg !== 'ok') {
-        alert(respuesta.msg);
-        return;
-    }
-
-    limpiarCliente();
-    obtenerClientes();
-    cargarEmpresas();
-});
-
-$('frmCliente').addEventListener('reset', e => {
-    e.preventDefault();
-    limpiarCliente();
-});
-
-$('txtBuscarCliente').addEventListener('keyup', () => obtenerClientes($('txtBuscarCliente').value));
-$('btnBuscarCliente').addEventListener('click', () => obtenerClientes($('txtBuscarCliente').value));
-
-async function obtenerClientes(buscar = '') {
-    const response = await fetch(`/usuario?buscar=${encodeURIComponent(buscar)}`);
-    const datos = await response.json();
-    let filas = '';
-
-    datos.forEach(e => {
-        filas += `<tr>
-            <td>${e.codigo}</td>
-            <td>${e.nombre}</td>
-            <td>${e.tipo}</td>
-            <td>
-                <button class="btn btn-sm btn-primary" onclick='editarUsuario(${JSON.stringify(e)})'>Editar</button>
-                <button class="btn btn-sm btn-danger" onclick='eliminarUsuario(${JSON.stringify(e)})'>DEL</button>
-            </td>
-        </tr>`;
-    });
-    $('tblUsuarios').innerHTML = filas;
-}
-
-function editarUsuario(data) {
-    accionCliente = 'modificar';
-    $('idUsuario').value = data.idUsuario;
-    $('txtCodigoCliente').value = data.codigo;
-    $('txtNombreCliente').value = data.nombre;
-    $('txtDireccionCliente').value = data.direccion;
-    $('txtTelefonoCliente').value = data.telefono;
-    $('txtEmailCliente').value = data.email;
-    $('cboTipoPersona').value = data.tipo;
-    $('frmCliente').scrollIntoView({behavior: 'smooth'});
-}
-
-async function eliminarCliente(data) {
-    if (!confirm(`¿Seguro de eliminar al usuario: ${data.nombre}?`)) return;
-
-    const response = await fetch('/usuario', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({accion: 'eliminar', idUsuario: data.idUsuario})
-    });
-    const respuesta = await response.json();
-
-    if (respuesta.msg !== 'ok') alert(respuesta.msg);
-    else {
-        obtenerClientes();
-        cargarEmpresas();
-    }
-}
-
-function limpiarCliente() {
-    accionCliente = 'nuevo';
-    $('idCliente').value = '';
-    $('frmCliente').reset();
-} 
-
-</script>
-
+        function cerrarVentana(){
+            $('.btn-close').off('click').on('click', e => {
+                e.preventDefault();
+                let form = e.target.dataset.form;
+                $(`#${form}`).hide();
+            });
+        }
+    </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-10-2026 a las 19:25:55
+-- Tiempo de generación: 22-10-2026 a las 03:41:22
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -59,10 +59,10 @@ CREATE TABLE `tarifas` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `usuario_usss06125`
+-- Estructura de tabla para la tabla `usuario_usss006125`
 --
 
-CREATE TABLE `usuario_usss06125` (
+CREATE TABLE `usuario_usss006125` (
   `IdUsuario` int(10) NOT NULL,
   `Usuario` varchar(35) NOT NULL,
   `clave` varchar(35) NOT NULL,
@@ -70,6 +70,14 @@ CREATE TABLE `usuario_usss06125` (
   `direccion` varchar(100) NOT NULL,
   `telefono` varchar(9) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuario_usss006125`
+--
+
+INSERT INTO `usuario_usss006125` (`IdUsuario`, `Usuario`, `clave`, `nombre`, `direccion`, `telefono`) VALUES
+(1, 'admin', '12345', 'Administrador', 'San Salvador', '0000-0000'),
+(2, 'admin', '12345', 'Administrador', 'San Salvador', '00000000');
 
 --
 -- Índices para tablas volcadas
@@ -90,9 +98,9 @@ ALTER TABLE `tarifas`
   ADD KEY `idx_tarifa_busqueda` (`idProducto`,`desde`,`hasta`,`fechaDesde`,`fechaHasta`);
 
 --
--- Indices de la tabla `usuario_usss06125`
+-- Indices de la tabla `usuario_usss006125`
 --
-ALTER TABLE `usuario_usss06125`
+ALTER TABLE `usuario_usss006125`
   ADD PRIMARY KEY (`IdUsuario`);
 
 --
@@ -112,10 +120,10 @@ ALTER TABLE `tarifas`
   MODIFY `idTarifa` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `usuario_usss06125`
+-- AUTO_INCREMENT de la tabla `usuario_usss006125`
 --
-ALTER TABLE `usuario_usss06125`
-  MODIFY `IdUsuario` int(10) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `usuario_usss006125`
+  MODIFY `IdUsuario` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
